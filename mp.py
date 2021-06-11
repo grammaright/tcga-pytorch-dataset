@@ -11,6 +11,8 @@ from pathlib import Path
 import pandas as pd
 
 
+TCGA_BASE = '/home/grammaright/Downloads/tcga'
+
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -29,26 +31,29 @@ def buffer(queue, done_queue, path):
         if matched_name is not None:       # single item queue
             raw_data = pd.read_csv(path + '/' + matched_name, sep='\t')
             queue.put(raw_data)
+            os.remove(path + '/' + matched_name)
 
         time.sleep(0.5)
 
     logger.info('[buffer] worker end.')
 
 
-def downloader(file_list, path, max_size=1048576):
+def downloader(file_list, done_queue, path, max_size=1048576):
     logger.info('[downloader] worker start.')
 
     for file in file_list:
         # download
         logger.info('[downloader] target file = {}'.format(file))
         while True:
-            used_size = sum(os.path.getsize(f) for f in os.listdir(path) if os.path.isfile(f))
+            logger.debug('[downloader] {}, {}'.format(os.listdir(path), path))
+            logger.info('[downloader] path = {}'.format(path))
+            used_size = sum(os.path.getsize(path + '/' + f) for f in os.listdir(path) if os.path.isfile(path + '/' + f))
             logger.info('[downloader] disk used = {}'.format(used_size))
 
             # Note that the capacity of disk usage can larger than max_size.
             if used_size < max_size:
                 # Downloading file from mounted path to temp path
-                target_dir = './tcga/' + file
+                target_dir = TCGA_BASE + '/' + file
                 filename = os.listdir(target_dir)[0]
 
                 logger.info('[downloader] downloading start ({})'.format(file))
@@ -57,19 +62,25 @@ def downloader(file_list, path, max_size=1048576):
 
                 # done
                 logger.info('[downloader] unlock the file ({})'.format(file))
+                Path(path + '/' + filename + '.lock').touch()                   # touch needed due to preserve the download order
                 shutil.move(path + '/' + filename + '.lock', path + '/' + filename)
                 break
 
             logger.info('[downloader] sleep for 0.5 sec..')
             time.sleep(0.5)
 
+        # exit if done 
+        # TODO: placement?
+        if done_queue.empty() is False:
+            break
+
     logger.info('[downloader] worker end.')
 
 
 class DatasetMPManager:
-
     def __init__(self, file_list):
-        logger.info('[DatasetMPManager] init')
+        logger.info('[DatasetMPManager] init(file_list={} of elems)'.format(len(file_list)))
+        logger.debug('[DatasetMPManager] {}'.format(file_list))
 
         # data
         self.file_list = file_list
@@ -85,7 +96,7 @@ class DatasetMPManager:
 
         # workers
         self.buffer = Process(target=buffer, args=(self.queue, self.done_queue, self.tmpdir.name))
-        self.downloader = Process(target=downloader, args=(file_list, self.tmpdir.name))
+        self.downloader = Process(target=downloader, args=(file_list, self.done_queue, self.tmpdir.name))
         self.buffer.start()
         self.downloader.start()
 
@@ -107,13 +118,21 @@ class DatasetMPManager:
             break
 
         self.idx += 1
-        if self.idx == len(self.file_list):         # end condition
-            logger.info('[DatasetMPManager] next(): iter done. final idx = {}'.format(self.idx))
-            # downloader will be done. Only stop buffer
-            self.done_queue.put(0)      # arbitary data to stop buffer
 
         return ret
 
     def __del__(self):
-        logger.info('[DatasetMPManager] done')
+        logger.info('[DatasetMPManager] cleanup')
+
+        # downloader will already be done. Only stop buffer
+        self.done_queue.put(0)      # arbitary data to stop buffer
+
+        # wait
+        self.buffer.join()
+        self.downloader.join()
+
+        # cleanup
         self.tmpdir.cleanup()
+
+        logger.info('[DatasetMPManager] bye')
+

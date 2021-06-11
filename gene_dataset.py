@@ -86,5 +86,6 @@ class MountGeneExpressionDataset(IterableDataset):
                 raw_data[raw_data['gene_id'].isin(self.gene_list)]
                 yield (torch.Tensor(list(raw_data['raw_count'])), label_idx)
             except Exception as e:
+                logger.warning('__iter__(): exception = {}'.format(str(e)))
                 continue
 
