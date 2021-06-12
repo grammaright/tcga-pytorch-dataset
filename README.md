@@ -11,10 +11,10 @@ TBA
 To use our DataLoader, you need to do the following.
 
 1. Install goofys and mount `tcga-2-open`.
-  - goofys URL: https://github.com/kahing/goofys
-  - Mount command line: `mkdir tcga; goofys tcga-2-open tcga;`.
+    - goofys URL: https://github.com/kahing/goofys
+    - Mount command line: `mkdir tcga; goofys tcga-2-open tcga;`.
 2. Install the python packages described in `requirements.txt`
-  - Of course you can install by `pip install -r requirements.txt`.
+    - Of course you can install by `pip install -r requirements.txt`.
 
 ### Usage
 
@@ -25,7 +25,7 @@ The following is an example:
 ```python
 fields, filters, gene_list = initialize_pan_cancer()
 raw_data, label_column = manifest_loader(fields, filters, "cases.disease_type")
-dataset = MountGeneExpressionDataset(raw_data, label_column, gene_list)
+dataset = MountGeneExpressionDataset('./tcga', raw_data, label_column, gene_list)   # The first parameter is the mount point.
 loader = DataLoader(dataset, batch_size=1)
 for data in loader:
     # Your ML tasks here!
@@ -42,3 +42,7 @@ We provies three test cases.
 2. Speed test: Is `MountGeneExpressionDataset` really fast than the naive one? See `sp_test.py`.
 3. NN test: Is `MountGeneExpressionDataset` really works in NN task? See `nn_test.py`.
 
+
+## Benchmark
+
+TBA

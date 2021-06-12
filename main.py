@@ -17,8 +17,8 @@ logger = logging.getLogger(__name__)
 
 def main():
     # equal_test()
-    speed_test()
-    # nn_test()
+    # speed_test()
+    nn_test()
 
 
 if __name__ == '__main__':

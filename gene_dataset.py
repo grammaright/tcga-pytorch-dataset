@@ -36,9 +36,8 @@ def manifest_loader(fields, filters, label):
 
 
 class NaiveMountGeneExpressionDataset(IterableDataset):
-    def __init__(self, raw_data, label_column, gene_list, normalized=False):
+    def __init__(self, tcga_base, raw_data, label_column, gene_list, normalized=False):
         super(NaiveMountGeneExpressionDataset).__init__()
-        # raw_data, label_column = manifest_loader(fields, filters,label)
         ## 지정해준 fields, filter에 해당하는 파일들의 목록(manifest) 를 불러온다
         ## 어떤 coulmn을 label로 사용할 것인지 label_column을 통해 지정해주어야 한다. 
         raw_data.rename(lambda x : x.split('.')[-1], axis='columns', inplace = True)
@@ -51,11 +50,12 @@ class NaiveMountGeneExpressionDataset(IterableDataset):
         
         self.gene_list = gene_list
         self.normalized = normalized
+        self.tcga_base = tcga_base
 
     def __iter__(self):
         for filename, label in zip(self.file_list, self.label_list):
-            raw_data = pd.read_csv("/home/grammaright/Downloads/tcga/" + filename + "/" + os.listdir("/home/grammaright/Downloads/tcga/" + filename)[0], sep='\t')
-            logger.info('naive target file={}'.format("/home/grammaright/Downloads/tcga/" + filename + "/" + os.listdir("/home/grammaright/Downloads/tcga/" + filename)[0]))
+            raw_data = pd.read_csv(self.tcga_base + '/' + filename + "/" + os.listdir(self.tcga_base + '/' + filename)[0], sep='\t')
+            logger.info('naive target file={}'.format(self.tcga_base + '/' + filename + "/" + os.listdir(self.tcga_base + '/' + filename)[0]))
             label_idx = self.label_dict[label]
             gene_column, count_column = '', ''
 
@@ -87,7 +87,7 @@ class NaiveMountGeneExpressionDataset(IterableDataset):
 
 
 class MountGeneExpressionDataset(IterableDataset):
-    def __init__(self, raw_data, label_column, gene_list, normalized=False):
+    def __init__(self, tcga_base, raw_data, label_column, gene_list, normalized=False):
         super(MountGeneExpressionDataset).__init__()
         # raw_data, label_column = manifest_loader(fields, filters,label)
         ## 지정해준 fields, filter에 해당하는 파일들의 목록(manifest) 를 불러온다
@@ -104,7 +104,7 @@ class MountGeneExpressionDataset(IterableDataset):
         self.normalized = normalized
 
         # spwan
-        self.manager = DatasetMPManager(self.file_list)
+        self.manager = DatasetMPManager(self.file_list, tcga_base)
 
     def __iter__(self):
         for filename, label in zip(self.file_list, self.label_list):

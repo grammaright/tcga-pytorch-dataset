@@ -169,9 +169,10 @@ def nn_test():
     fields, filters, gene_list = initialize_pan_cancer()
     raw_data, label_column = manifest_loader(fields, filters, "cases.disease_type")
     train_data, test_data = train_test_split(raw_data, test_size=0.33, random_state=42)
+    tcga_base = '/home/grammaright/Downloads/tcga'
 
-    train_dataset = MountGeneExpressionDataset(train_data, label_column, gene_list)
-    test_dataset = MountGeneExpressionDataset(train_data, label_column, gene_list)
+    train_dataset = MountGeneExpressionDataset(tcga_base, train_data, label_column, gene_list)
+    test_dataset = MountGeneExpressionDataset(tcga_base, train_data, label_column, gene_list)
     # test_dataset = MountGeneExpressionDataset(test_data, label_column, gene_list)
     train_loader = DataLoader(train_dataset, batch_size = 10)
     test_loader = DataLoader(test_dataset, batch_size = 10)

@@ -13,8 +13,6 @@ from pathlib import Path
 import pandas as pd
 
 
-TCGA_BASE = '/home/grammaright/Downloads/tcga'
-
 logging.basicConfig(filename='gene_dataset.log', filemode='a', format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s', datefmt='%H:%M:%S', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -44,7 +42,7 @@ def buffer(queue, path):
     logger.info('[buffer] worker end.')
 
 
-def downloader(file_list, path, max_size=1073741824):
+def downloader(file_list, tcga_base, path, max_size=1073741824):
     logger.info('[downloader] worker start.')
 
     for file in file_list:
@@ -59,7 +57,7 @@ def downloader(file_list, path, max_size=1073741824):
             # Note that the capacity of disk usage can larger than max_size.
             if used_size < max_size or True: # TODO: "or True" is to test maximum disk size
                 # Downloading file from mounted path to temp path
-                target_dir = TCGA_BASE + '/' + file
+                target_dir = tcga_base + '/' + file
                 filename = os.listdir(target_dir)[0]
 
                 logger.info('[downloader] downloading start ({})'.format(target_dir + '/' + filename))
@@ -85,7 +83,7 @@ def downloader(file_list, path, max_size=1073741824):
 
 
 class DatasetMPManager:
-    def __init__(self, file_list):
+    def __init__(self, file_list, tcga_base):
         logger.info('[DatasetMPManager] init(file_list={} of elems)'.format(len(file_list)))
         logger.debug('[DatasetMPManager] {}'.format(file_list))
 
@@ -102,7 +100,7 @@ class DatasetMPManager:
 
         # workers
         self.buffer = Process(target=buffer, args=(self.queue, self.tmpdir.name))
-        self.downloader = Process(target=downloader, args=(file_list, self.tmpdir.name))
+        self.downloader = Process(target=downloader, args=(file_list, tcga_base, self.tmpdir.name))
         self.buffer.start()
         self.downloader.start()
 

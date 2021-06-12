@@ -80,8 +80,8 @@ def speed_test():
     raw_data, label_column = manifest_loader(fields, filters, "cases.disease_type")
 
     # Test case:
-
-    dataset2 = MountGeneExpressionDataset(raw_data, label_column, gene_list)
+    tcga_base = '/home/grammaright/Downloads/tcga'
+    dataset2 = MountGeneExpressionDataset(tcga_base, raw_data, label_column, gene_list)
     loader2 = DataLoader(dataset2, batch_size=1)
     start = datetime.datetime.now()
     for idx, data1 in enumerate(loader2):

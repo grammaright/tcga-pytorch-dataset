@@ -77,19 +77,20 @@ def initialize_pam50():
 def equal_test():
     fields, filters, gene_list = initialize_pam50()
     raw_data, label_column = manifest_loader(fields, filters, "cases.disease_type")
+    tcga_base = '/home/grammaright/Downloads/tcga'
 
     # Test case:
-    dataset1 = NaiveMountGeneExpressionDataset(raw_data, label_column, gene_list)
-    dataset2 = MountGeneExpressionDataset(raw_data, label_column, gene_list)
+    dataset1 = NaiveMountGeneExpressionDataset(tcga_base, raw_data, label_column, gene_list)
+    dataset2 = MountGeneExpressionDataset(tcga_base, raw_data, label_column, gene_list)
 
     loader1 = DataLoader(dataset1, batch_size=1)
     loader2 = DataLoader(dataset2, batch_size=1)
     for idx, (data1, data2) in enumerate(zip(loader1, loader2)):
+        print(idx, data1[0], data2[0])
         res = torch.equal(data1[0], data2[0])
         if res is False or data1[1] != data2[1]:
             print('Diff!!!!!')
             break
-        
 
     print('Test passed')
 
