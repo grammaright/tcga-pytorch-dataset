@@ -4,6 +4,8 @@ import time
 import shutil
 import os.path
 import tempfile
+import pdb # TODO:
+import datetime
 
 from multiprocessing import Process, SimpleQueue
 from pathlib import Path
@@ -15,6 +17,10 @@ TCGA_BASE = '/home/grammaright/Downloads/tcga'
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+
+def diff_in_ms(start, end):
+    return (end - start).seconds * 1000 + ((end - start).microseconds / 1000)
 
 
 def buffer(queue, done_queue, path):
@@ -38,12 +44,12 @@ def buffer(queue, done_queue, path):
     logger.info('[buffer] worker end.')
 
 
-def downloader(file_list, done_queue, path, max_size=1048576):
+def downloader(file_list, done_queue, path, max_size=1073741824):
     logger.info('[downloader] worker start.')
 
     for file in file_list:
         # download
-        logger.info('[downloader] target file = {}'.format(file))
+        logger.info('[downloader] target file = {}'.format(path + '/' + file))
         while True:
             logger.debug('[downloader] {}, {}'.format(os.listdir(path), path))
             logger.info('[downloader] path = {}'.format(path))
@@ -51,17 +57,22 @@ def downloader(file_list, done_queue, path, max_size=1048576):
             logger.info('[downloader] disk used = {}'.format(used_size))
 
             # Note that the capacity of disk usage can larger than max_size.
-            if used_size < max_size:
+            if used_size < max_size or True: # TODO:
                 # Downloading file from mounted path to temp path
                 target_dir = TCGA_BASE + '/' + file
                 filename = os.listdir(target_dir)[0]
 
-                logger.info('[downloader] downloading start ({})'.format(file))
+                logger.info('[downloader] downloading start ({})'.format(target_dir + '/' + filename))
+                start = datetime.datetime.now()
                 shutil.copy2(target_dir + '/' + filename, path + '/' + filename + '.lock')
-                logger.info('[downloader] downloading done ({})'.format(file))
+                end = datetime.datetime.now()
+                filesize = os.path.getsize(path + '/' + filename + '.lock')
+                diff = diff_in_ms(start, end)
+                logger.info('[downloader] downloading done ({}). filesize={}, duration={} ms, throughput={} MB/s'.format(target_dir + '/' + filename,
+                    filesize, diff, (filesize / 1024 / 1024) / (diff / 1000)))
 
                 # done
-                logger.info('[downloader] unlock the file ({})'.format(file))
+                logger.info('[downloader] unlock the file ({})'.format(target_dir + '/' + filename))
                 Path(path + '/' + filename + '.lock').touch()                   # touch needed due to preserve the download order
                 shutil.move(path + '/' + filename + '.lock', path + '/' + filename)
                 break
