@@ -9,12 +9,12 @@ import torch.optim as optim
 
 from torch import nn
 from torch.utils.data import DataLoader
-from gene_dataset import NaiveMountGeneExpressionDataset, MountGeneExpressionDataset
 from sklearn.model_selection import train_test_split
+
 from gene_dataset import NaiveMountGeneExpressionDataset, MountGeneExpressionDataset, manifest_loader
 
 
-logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+logging.basicConfig(filename='gene_dataset.log', filemode='a', format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s', datefmt='%H:%M:%S', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 

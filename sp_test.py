@@ -1,6 +1,4 @@
-import logging
 import pandas as pd
-import logging.config
 import torch
 import sys
 import datetime
@@ -10,9 +8,6 @@ from torch.utils.data import DataLoader
 from gene_dataset import NaiveMountGeneExpressionDataset, MountGeneExpressionDataset
 
 from gene_dataset import NaiveMountGeneExpressionDataset, MountGeneExpressionDataset, manifest_loader
-
-logging.basicConfig(stream=sys.stdout, level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 
 def initialize_pam50():
@@ -85,29 +80,18 @@ def speed_test():
     raw_data, label_column = manifest_loader(fields, filters, "cases.disease_type")
 
     # Test case:
-    dataset1 = NaiveMountGeneExpressionDataset(raw_data, label_column, gene_list)
-    loader1 = DataLoader(dataset1, batch_size=1)
-    start = datetime.datetime.now()
-    for idx, data1 in enumerate(loader1):
-        logger.info(idx)
-        time.sleep(5)
-        if idx > 10:
-            break
-
-    end = datetime.datetime.now()
-    logger.info('NaiveMountGeneExpressionDataset (iter=10, batch_size=1) : {} sec'.format((end - start).seconds))
 
     dataset2 = MountGeneExpressionDataset(raw_data, label_column, gene_list)
     loader2 = DataLoader(dataset2, batch_size=1)
     start = datetime.datetime.now()
     for idx, data1 in enumerate(loader2):
-        logger.info(idx)
+        print(idx)
         time.sleep(5)
-        if idx > 10:
+        if idx > 5:
             break
 
     end = datetime.datetime.now()
-    logger.info('MountGeneExpressionDataset (iter=10, batch_size=1) : {} sec'.format((end - start).seconds))
+    print('MountGeneExpressionDataset (iter=10, batch_size=1) : {} sec'.format((end - start).seconds))
 
-    logger.info("Test passed")
+    print("Test passed")
 

@@ -11,7 +11,7 @@ from nn_test import nn_test
 from eq_test import equal_test
 from sp_test import speed_test
 
-logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+logging.basicConfig(filename='gene_dataset.log', filemode='a', format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s', datefmt='%H:%M:%S', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 

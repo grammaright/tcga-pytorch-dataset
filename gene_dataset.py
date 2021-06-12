@@ -11,7 +11,7 @@ from io import StringIO
 from mp import DatasetMPManager
 
 
-logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+logging.basicConfig(filename='gene_dataset.log', filemode='a', format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s', datefmt='%H:%M:%S', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 files_endpt = "https://api.gdc.cancer.gov/legacy/files"
