@@ -7,7 +7,7 @@ import tempfile
 import pdb # TODO:
 import datetime
 
-from multiprocessing import Process, SimpleQueue
+from multiprocessing import Process, Queue
 from pathlib import Path
 
 import pandas as pd
@@ -32,7 +32,9 @@ def buffer(queue, path):
                 break
 
         logger.info('[buffer] matched_name = {}'.format(matched_name))
-        if matched_name is not None:       # single item queue
+        logger.info('[buffer] queue.full() = {} (approximate)'.format(queue.full()))
+        if matched_name is not None and queue.full() is False:       # single item queue
+            logger.info('[buffer] consume')
             raw_data = pd.read_csv(path + '/' + matched_name, sep='\t')
             queue.put(raw_data)
             os.remove(path + '/' + matched_name)
@@ -91,8 +93,8 @@ class DatasetMPManager:
         self.file_list = file_list
         self.idx = 0
 
-        # queue
-        self.queue = SimpleQueue()
+        # queue. 3 is for max buf size 
+        self.queue = Queue(3)
 
         # temp directory
         self.tmpdir = tempfile.TemporaryDirectory()

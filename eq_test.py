@@ -17,7 +17,8 @@ def initialize_pam50():
         "cases.submitter_id",
         "cases.samples.sample_type",
         "cases.disease_type",
-        "file_id"
+        "file_id",
+        "file_size"
     ]
 
     fields = ",".join(fields)

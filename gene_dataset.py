@@ -87,15 +87,25 @@ class NaiveMountGeneExpressionDataset(IterableDataset):
 
 
 class MountGeneExpressionDataset(IterableDataset):
-    def __init__(self, tcga_base, raw_data, label_column, gene_list, normalized=False):
+    def __init__(self, tcga_base, raw_data, label_column, gene_list, normalized=False, opt=True):
         super(MountGeneExpressionDataset).__init__()
         # raw_data, label_column = manifest_loader(fields, filters,label)
         ## 지정해준 fields, filter에 해당하는 파일들의 목록(manifest) 를 불러온다
         ## 어떤 coulmn을 label로 사용할 것인지 label_column을 통해 지정해주어야 한다. 
         raw_data.rename(lambda x : x.split('.')[-1], axis='columns', inplace = True)
         label_column = label_column.split('.')[-1]
-        self.file_list = list(raw_data['file_id'])
-        self.label_list = list(raw_data[label_column])
+
+        if opt:     # scheduling: small size first
+            rfl, rll = list(raw_data['file_id']), list(raw_data[label_column])
+            self.file_list, self.label_list = [], []
+            for idx, size in sorted(enumerate(raw_data['file_size']), key=lambda x: x[1]):
+                self.file_list.append(rfl[idx])
+                self.label_list.append(rll[idx])
+
+        else:
+            self.file_list = list(raw_data['file_id'])
+            self.label_list = list(raw_data[label_column])
+
         self.label_dict = {}
         for idx, label in enumerate(set(self.label_list)):
             self.label_dict[label] = idx
