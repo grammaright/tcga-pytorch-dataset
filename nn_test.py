@@ -77,6 +77,13 @@ def initialize_pan_cancer():
                     "field": "files.data_format",
                     "value": ["TXT"]
                 }
+            },
+            {
+                "op": "in",
+                "content":{
+                    "field": "files.tags",
+                    "value": ["unnormalized"]
+                }
             }
         ]
     }
