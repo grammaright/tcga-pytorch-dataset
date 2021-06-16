@@ -17,13 +17,14 @@ To use our DataLoader, you need to do the following.
 
 1. Install goofys and mount `tcga-2-open`.
     - goofys URL: https://github.com/kahing/goofys
+    - `tcga-2-open` description : https://registry.opendata.aws/tcga/
     - Mount command line: `mkdir tcga; goofys tcga-2-open tcga;`.
 2. Install the python packages described in `requirements.txt`
     - Of course you can install by `pip install -r requirements.txt`.
 
 ### Usage
 
-We provies `MountGeneExpressionDataset` and `NaiveMountGeneExpressionDataset` which are custom `Dataset` class of torch.
+We provies `MountGeneExpressionDataset` and `NaiveMountGeneExpressionDataset` which are custom `Dataset` classes of torch.
 You just need two additional lines and `MountGeneExpressionDataset` instead of other Dataset.
 The following is an example:
 
@@ -43,11 +44,9 @@ See the next step.
 ### Tests
 
 We provies three test cases.
+
 1. Equality test: `NaiveMountGeneExpressionDataset` and `MountGeneExpressionDataset` produces the same results? See `eq_test.py`.
 2. Speed test: Is `MountGeneExpressionDataset` really fast than the naive one? See `sp_test.py`.
 3. NN test: Is `MountGeneExpressionDataset` really works in NN task? See `nn_test.py`.
 
 
-## Benchmark
-
-TBA
