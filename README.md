@@ -2,7 +2,12 @@
 
 ## Introduction
 
-TBA
+TCGA is huge (almost 2.5 petabytes) and unstructured data.
+Downloading all data is impossible, so a data scientist generally mounts the AWS-providing bucket to use the data.
+However, using the mounted one is too slow with a naive PyTorch DataSet.
+
+We introduce a customized DataSet (based on PyTorch IterableDataset) which provides faster performance.
+We accelerate the Dataset by pipelining (hiding download latency), scheduling (small data first), and caching (holding cost-effective and evicting cost-ineffective).
 
 ## How to use?
 
