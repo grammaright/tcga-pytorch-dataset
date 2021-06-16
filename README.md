@@ -11,7 +11,7 @@ We accelerate the Dataset by pipelining (hiding download latency), scheduling (s
 
 ## How to use?
 
-### preliminaries
+### Preliminaries
 
 To use our DataLoader, you need to do the following.
 
