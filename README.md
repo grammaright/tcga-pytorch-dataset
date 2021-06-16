@@ -1,9 +1,9 @@
-# Data Loader TCGA
+# PyTorch DataSet for TCGA
 
 ## Introduction
 
 TCGA is huge (almost 2.5 petabytes) and unstructured data.
-Downloading all data is impossible, so a data scientist generally mounts the AWS-providing bucket to use the data.
+Downloading all data is impossible, so a data scientist generally mounts the AWS-providing S3 bucket to use the data.
 However, using the mounted one is too slow with a naive PyTorch DataSet.
 
 We introduce a customized DataSet (based on PyTorch IterableDataset) which provides faster performance.
