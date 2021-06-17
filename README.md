@@ -19,6 +19,7 @@ To use our DataLoader, you need to do the following.
     - goofys URL: https://github.com/kahing/goofys
     - `tcga-2-open` description : https://registry.opendata.aws/tcga/
     - Mount command line: `mkdir tcga; goofys tcga-2-open tcga;`.
+    - Note: Using the binary in Linux is the easiest way.
 2. Install the python packages described in `requirements.txt`
     - Of course you can install by `pip install -r requirements.txt`.
 
